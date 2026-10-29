@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111111">
+<title>Simple Moments</title>
+
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #111;
+  color: white;
+  overflow: hidden;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: #111;
+  isolation: isolate;
+}
+
+/* MEDIA LAYERS */
+
+.slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 1.5s ease, visibility 1.5s;
+  z-index: -2;
+}
+
+.slide.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Dark backdrop behind full images */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  background: #111;
+}
+
+/* Cinematic overlay */
+.shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0,0,0,.38),
+    rgba(0,0,0,.05) 45%,
+    rgba(0,0,0,.48)
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* HEADER */
+
+header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  padding: 28px 7%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-family: Georgia, serif;
+  font-size: 18px;
+  letter-spacing: 3px;
+}
+
+.logo span {
+  color: #d9bd8b;
+}
+
+.header-note {
+  font-size: 9px;
+  letter-spacing: 3px;
+}
+
+/* CENTER TEXT */
+
+.content {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.copy {
+  max-width: 850px;
+  animation: reveal 1.2s ease both;
+}
+
+.eyebrow {
+  color: #e0c79b;
+  font-size: 10px;
+  letter-spacing: 5px;
+  margin-bottom: 24px;
+}
+
+h1 {
+  font-family: Georgia, serif;
+  font-size: clamp(43px, 8vw, 100px);
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+h1 em {
+  color: #e0c79b;
+  font-weight: 400;
+}
+
+.description {
+  font-size: 12px;
+  letter-spacing: 2px;
+  margin-top: 24px;
+  line-height: 1.8;
+}
+
+/* BOTTOM CONTROLS */
+
+.controls {
+  position: absolute;
+  bottom: 28px;
+  left: 7%;
+  right: 7%;
+  z-index: 5;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.counter {
+  color: #ddd;
+  font-size: 10px;
+  letter-spacing: 3px;
+}
+
+.counter span {
+  color: #e0c79b;
+}
+
+.buttons {
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  background: rgba(0,0,0,.35);
+  border: 1px solid #ffffff70;
+  color: white;
+  padding: 11px 15px;
+  font-size: 9px;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #fff;
+  color: #111;
+}
+
+.progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 0%;
+  background: #e0c79b;
+  z-index: 6;
+}
+
+/* TEXT ANIMATION */
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+  header {
+    padding: 22px 5%;
+  }
+
+  .logo {
+    font-size: 14px;
+    letter-spacing: 2px;
+  }
+
+  .header-note {
+    font-size: 8px;
+    letter-spacing: 1px;
+  }
+
+  .eyebrow {
+    font-size: 9px;
+    letter-spacing: 3px;
+  }
+
+  .description {
+    font-size: 10px;
+  }
+
+  .controls {
+    left: 5%;
+    right: 5%;
+    bottom: 22px;
+  }
+
+  button {
+    padding: 10px;
+    font-size: 8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<main class="stage">
+
+  <div class="backdrop"></div>
+
+  <!-- PHOTO 1 -->
+  <img
+    class="slide active"
+    id="photoOne"
+    src="photo1.jpg"
+    alt="First photograph"
+  >
+
+  <!-- PHOTO 2 -->
+  <img
+    class="slide"
+    id="photoTwo"
+    src="photo2.jpg"
+    alt="Second photograph"
+  >
+
+  <!-- VIDEO -->
+  <video
+    class="slide"
+    id="film"
+    muted
+    playsinline
+    preload="metadata"
+  >
+    <source src="video.mp4" type="video/mp4">
+  </video>
+
+  <div class="shade"></div>
+
+  <header>
+    <div class="logo">simple<span>.</span></div>
+    <div class="header-note">LIFE IN MOMENTS</div>
+  </header>
+
+  <div class="content">
+    <div class="copy" id="copy">
+      <p class="eyebrow">A VISUAL STORY</p>
+      <h1>Beautifully<br><em>Simple.</em></h1>
+      <p class="description">
+        Little moments. Lasting memories.
+      </p>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="counter">
+      <span id="current">01</span> / 03
+    </div>
+
+    <div class="buttons">
+      <button id="sound">SOUND OFF</button>
+      <button id="playPause">PAUSE</button>
+      <button id="next">NEXT →</button>
+    </div>
+  </div>
+
+  <div class="progress" id="progress"></div>
+
+</main>
+
+<script>
+const slides = [
+  document.getElementById("photoOne"),
+  document.getElementById("photoTwo"),
+  document.getElementById("film")
+];
+
+const copy = document.getElementById("copy");
+const current = document.getElementById("current");
+const progress = document.getElementById("progress");
+const soundButton = document.getElementById("sound");
+const playButton = document.getElementById("playPause");
+
+const messages = [
+  {
+    eyebrow: "A VISUAL STORY",
+    title: "Beautifully<br><em>Simple.</em>",
+    description: "Little moments. Lasting memories."
+  },
+  {
+    eyebrow: "THE ART OF STILLNESS",
+    title: "Find your<br><em>moment.</em>",
+    description: "There is beauty in the ordinary."
+  },
+  {
+    eyebrow: "LIFE IN MOTION",
+    title: "Feel every<br><em>second.</em>",
+    description: "Some memories deserve to move."
+  }
+];
+
+let index = 0;
+let paused = false;
+let timer = null;
+let startedAt = 0;
+let remaining = 7000;
+let animationFrame = null;
+
+const photoDuration = 7000;
+const video = slides[2];
+
+function updateText() {
+  const message = messages[index];
+
+  copy.style.animation = "none";
+  void copy.offsetWidth;
+  copy.style.animation = "reveal 1.2s ease both";
+
+  copy.innerHTML = `
+    <p class="eyebrow">${message.eyebrow}</p>
+    <h1>${message.title}</h1>
+    <p class="description">${message.description}</p>
+  `;
+
+  current.textContent = String(index + 1).padStart(2, "0");
+}
+
+function stopTimers() {
+  clearTimeout(timer);
+  cancelAnimationFrame(animationFrame);
+}
+
+function showSlide(nextIndex) {
+  stopTimers();
+
+  slides[index].classList.remove("active");
+
+  if (index === 2) {
+    video.pause();
+    video.currentTime = 0;
+  }
+
+  index = nextIndex;
+  slides[index].classList.add("active");
+  updateText();
+
+  progress.style.width = "0%";
+
+  if (index === 2) {
+    video.muted = soundButton.textContent === "SOUND OFF";
+    video.currentTime = 0;
+
+    video.play().catch(() => {});
+
+    video.onended = () => {
+      if (!paused) showSlide(0);
+    };
+
+    video.ontimeupdate = () => {
+      if (index === 2 && video.duration) {
+        progress.style.width =
+          (video.currentTime / video.duration * 100) + "%";
+      }
+    };
+
+    // Fallback if video duration is unavailable.
+    timer = setTimeout(() => {
+      if (index === 2 && !paused) showSlide(0);
+    }, 60000);
+
+  } else {
+    remaining = photoDuration;
+    startPhotoTimer();
+  }
+}
+
+function startPhotoTimer() {
+  startedAt = Date.now();
+
+  function tick() {
+    if (paused || index === 2) return;
+
+    const elapsed = Date.now() - startedAt;
+    const fraction = Math.min(elapsed / remaining, 1);
+
+    progress.style.width = (fraction * 100) + "%";
+
+    if (fraction >= 1) {
+      showSlide((index + 1) % slides.length);
+      return;
+    }
+
+    animationFrame = requestAnimationFrame(tick);
+  }
+
+  animationFrame = requestAnimationFrame(tick);
+}
+
+function nextSlide() {
+  paused = false;
+  playButton.textContent = "PAUSE";
+  showSlide((index + 1) % slides.length);
+}
+
+playButton.addEventListener("click", () => {
+  paused = !paused;
+  playButton.textContent = paused ? "PLAY" : "PAUSE";
+
+  if (index === 2) {
+    if (paused) video.pause();
+    else video.play().catch(() => {});
+    return;
+  }
+
+  if (paused) {
+    remaining -= Date.now() - startedAt;
+    stopTimers();
+  } else {
+    startPhotoTimer();
+  }
+});
+
+document.getElementById("next").addEventListener("click", nextSlide);
+
+soundButton.addEventListener("click", async () => {
+  video.muted = !video.muted;
+  soundButton.textContent = video.muted ? "SOUND OFF" : "SOUND ON";
+
+  if (!video.muted && index === 2) {
+    try {
+      await video.play();
+    } catch (error) {
+      video.muted = true;
+      soundButton.textContent = "SOUND OFF";
+    }
+  }
+});
+
+video.addEventListener("error", () => {
+  // If the video cannot load, continue the slideshow.
+  if (index === 2 && !paused) showSlide(0);
+});
+
+showSlide(0);
+</script>
+
+</body>
+</html>
